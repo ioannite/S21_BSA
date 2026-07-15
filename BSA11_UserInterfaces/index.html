@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BarberShop - Онлайн запись</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header будет динамически обновляться через JavaScript -->
+        <header class="header" id="header">
+            <div class="header-content">
+                <button class="back-btn" id="back-btn" onclick="goBack()">←</button>
+                <h1 class="header-title" id="header-title">Главная</h1>
+                <button class="profile-btn" id="profile-btn" onclick="toggleProfile()">👤</button>
+            </div>
+        </header>
+
+        <main class="main-content" id="main-content">
+            <!-- Экран 1: Главная страница -->
+            <div class="screen active" id="home-screen">
+                <div class="hero-section">
+                    <div class="logo">
+                        <i class="fas fa-cut"></i>
+                        <h1>BarberShop</h1>
+                    </div>
+                    <p class="tagline">Идеальная стрижка в идеальное время</p>
+                </div>
+
+                <div class="welcome-card">
+                    <h2>Добро пожаловать!</h2>
+                    <p>Запишитесь на стрижку к лучшим мастерам города</p>
+                </div>
+
+                <div class="actions-grid">
+                    <button class="action-btn primary" onclick="startNewBooking()">
+                        <div class="action-icon">✂️</div>
+                        <span>Записаться на стрижку</span>
+                    </button>
+                    <button class="action-btn" onclick="showScreen('masters-screen')">
+                        <div class="action-icon">👨‍🎨</div>
+                        <span>Мастера</span>
+                    </button>
+                    <button class="action-btn" onclick="showScreen('login-screen')">
+                        <div class="action-icon">🔐</div>
+                        <span>Войти</span>
+                    </button>
+                    <button class="action-btn" onclick="showScreen('profile-screen')">
+                        <div class="action-icon">👤</div>
+                        <span>Профиль</span>
+                    </button>
+                </div>
+
+                <div class="info-cards">
+                    <div class="info-card">
+                        <i class="fas fa-clock"></i>
+                        <h3>Работаем</h3>
+                        <p>Пн-Вс: 9:00-21:00</p>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <h3>Адрес</h3>
+                        <p>ул. Барберная, 15</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Экран 2: Регистрация (UC01) -->
+            <div class="screen" id="register-screen">
+                <div class="form-container">
+                    <h2>Регистрация</h2>
+                    <p class="subtitle">Создайте аккаунт для удобной записи</p>
+
+                    <div class="input-group">
+                        <label for="register-phone">Номер телефона</label>
+                        <input 
+                            type="tel" 
+                            id="register-phone" 
+                            placeholder="+7 (___) ___-__-__"
+                            class="phone-input"
+                            oninput="formatPhone(this)"
+                        >
+                        <div class="input-error" id="phone-error"></div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="register-name">Имя (и отчество)</label>
+                        <input 
+                            type="text" 
+                            id="register-name" 
+                            placeholder="Иван Иванов"
+                            class="text-input"
+                        >
+                    </div>
+
+                    <div class="input-group">
+                        <label for="register-password">Пароль</label>
+                        <input 
+                            type="password" 
+                            id="register-password" 
+                            placeholder="Придумайте пароль"
+                            class="password-input"
+                            oninput="checkPasswordStrength(this)"
+                        >
+                        <div class="password-strength">
+                            <span id="password-strength-text">Введите пароль</span>
+                            <div class="strength-bar">
+                                <div class="strength-fill" id="strength-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn-primary" onclick="registerUser()">
+                        Зарегистрироваться
+                    </button>
+
+                    <p class="login-link">
+                        Уже есть аккаунт? <a href="#" onclick="showScreen('login-screen')">Войти</a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Экран 3: Вход -->
+            <div class="screen" id="login-screen">
+                <div class="form-container">
+                    <h2>Вход в аккаунт</h2>
+                    <p class="subtitle">Введите данные для входа</p>
+
+                    <div class="input-group">
+                        <label for="login-phone">Номер телефона</label>
+                        <input 
+                            type="tel" 
+                            id="login-phone" 
+                            placeholder="+7 (___) ___-__-__"
+                            class="phone-input"
+                        >
+                    </div>
+
+                    <div class="input-group">
+                        <label for="login-password">Пароль</label>
+                        <input 
+                            type="password" 
+                            id="login-password" 
+                            placeholder="Введите пароль"
+                            class="password-input"
+                        >
+                    </div>
+
+                    <button class="btn-primary" onclick="loginUser()">
+                        Войти
+                    </button>
+
+                    <p class="register-link">
+                        Нет аккаунта? <a href="#" onclick="showScreen('register-screen')">Зарегистрироваться</a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Экран 4: Выбор услуги -->
+            <div class="screen" id="services-screen">
+                <div class="screen-header">
+                    <h2>Выберите услугу</h2>
+                    <p class="subtitle">Выберите одну или несколько услуг</p>
+                </div>
+
+                <div class="services-list">
+                    <div class="service-card selected" onclick="selectService(this)" data-id="1">
+                        <div class="service-icon">✂️</div>
+                        <div class="service-info">
+                            <h3>Мужская стрижка</h3>
+                            <p>Классическая или современная стрижка</p>
+                            <div class="service-price">1500 ₽</div>
+                        </div>
+                        <div class="service-check">✓</div>
+                    </div>
+
+                    <div class="service-card" onclick="selectService(this)" data-id="2">
+                        <div class="service-icon">💈</div>
+                        <div class="service-info">
+                            <h3>Бритье</h3>
+                            <p>Бритье опасной бритвой с уходом</p>
+                            <div class="service-price">1200 ₽</div>
+                        </div>
+                        <div class="service-check">✓</div>
+                    </div>
+
+                    <div class="service-card" onclick="selectService(this)" data-id="3">
+                        <div class="service-icon">🧔</div>
+                        <div class="service-info">
+                            <h3>Стрижка бороды</h3>
+                            <p>Коррекция и укладка бороды</p>
+                            <div class="service-price">800 ₽</div>
+                        </div>
+                        <div class="service-check">✓</div>
+                    </div>
+
+                    <div class="service-card" onclick="selectService(this)" data-id="4">
+                        <div class="service-icon">🧴</div>
+                        <div class="service-info">
+                            <h3>Комплекс "Все включено"</h3>
+                            <p>Стрижка + бритье + уход</p>
+                            <div class="service-price">3000 ₽</div>
+                        </div>
+                        <div class="service-check">✓</div>
+                    </div>
+                </div>
+
+                <button class="btn-primary" id="services-continue-btn" onclick="showScreen('datetime-screen')" disabled>
+                    Продолжить → Выбор даты и времени
+                </button>
+            </div>
+
+            <!-- Экран 5: Выбор даты и времени (теперь перед мастерами) -->
+            <div class="screen" id="datetime-screen">
+                <div class="screen-header">
+                    <h2>Выберите дату и время</h2>
+                    <p class="subtitle">Сначала выберите удобный слот</p>
+                </div>
+
+                <!-- Календарь -->
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <button class="calendar-nav" onclick="prevMonth()">←</button>
+                        <div class="calendar-month-year" id="calendar-month-year">Апрель 2026</div>
+                        <button class="calendar-nav" onclick="nextMonth()">→</button>
+                    </div>
+                    <div class="calendar-weekdays">
+                        <span>Пн</span>
+                        <span>Вт</span>
+                        <span>Ср</span>
+                        <span>Чт</span>
+                        <span>Пт</span>
+                        <span>Сб</span>
+                        <span>Вс</span>
+                    </div>
+                    <div class="calendar-days" id="calendar-days">
+                        <!-- Дни генерируются через JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Выбранная дата -->
+                <div class="selected-date-info" id="selected-date-info" style="display: none;">
+                    <i class="fas fa-calendar-check"></i>
+                    <span id="selected-date-text">24 апреля 2026, Пятница</span>
+                </div>
+
+                <!-- Слоты времени -->
+                <div class="time-slots" id="time-slots-container">
+                    <div class="time-slot available" onclick="selectTimeSlot(this)">
+                        10:00 - 11:00
+                    </div>
+                    <div class="time-slot available" onclick="selectTimeSlot(this)">
+                        11:00 - 12:00
+                    </div>
+                    <div class="time-slot booked">
+                        12:00 - 13:00
+                    </div>
+                    <div class="time-slot available" onclick="selectTimeSlot(this)">
+                        13:00 - 14:00
+                    </div>
+                    <div class="time-slot available" onclick="selectTimeSlot(this)">
+                        14:00 - 15:00
+                    </div>
+                    <div class="time-slot available" onclick="selectTimeSlot(this)">
+                        15:00 - 16:00
+                    </div>
+                    <div class="time-slot booked">
+                        16:00 - 17:00
+                    </div>
+                    <div class="time-slot available" onclick="selectTimeSlot(this)">
+                        17:00 - 18:00
+                    </div>
+                </div>
+
+                <button class="btn-primary" id="datetime-continue-btn" onclick="showScreen('masters-screen')" disabled>
+                    Продолжить → Выбор мастера
+                </button>
+            </div>
+
+            <!-- Экран 6: Выбор мастера (теперь после даты/времени) -->
+            <div class="screen" id="masters-screen">
+                <div class="screen-header">
+                    <h2>Выберите мастера</h2>
+                    <p class="subtitle" id="masters-subtitle">Доступные мастера на выбранное время</p>
+                </div>
+
+                <div class="selected-slot-info" id="selected-slot-info" style="display: none;">
+                    <i class="fas fa-clock"></i>
+                    <span id="selected-slot-text">24 апр, 14:00-15:00</span>
+                    <button class="change-btn" onclick="showScreen('datetime-screen')">Изменить</button>
+                </div>
+
+                <div class="masters-list">
+                    <div class="master-card selected" onclick="selectMaster(this)" data-id="1">
+                        <div class="master-avatar">
+                            <img src="https://i.pravatar.cc/100?img=1" alt="Алексей">
+                        </div>
+                        <div class="master-info">
+                            <h3>Алексей Петров</h3>
+                            <p>Старший барбер, 8 лет опыта</p>
+                            <div class="master-rating">
+                                <span class="stars">★★★★★</span>
+                                <span class="rating">4.9</span>
+                            </div>
+                        </div>
+                        <div class="master-check">✓</div>
+                    </div>
+
+                    <div class="master-card" onclick="selectMaster(this)" data-id="2">
+                        <div class="master-avatar">
+                            <img src="https://i.pravatar.cc/100?img=2" alt="Дмитрий">
+                        </div>
+                        <div class="master-info">
+                            <h3>Дмитрий Смирнов</h3>
+                            <p>Специалист по бородам</p>
+                            <div class="master-rating">
+                                <span class="stars">★★★★☆</span>
+                                <span class="rating">4.7</span>
+                            </div>
+                        </div>
+                        <div class="master-check">✓</div>
+                    </div>
+
+                    <div class="master-card" onclick="selectMaster(this)" data-id="3">
+                        <div class="master-avatar">
+                            <img src="https://i.pravatar.cc/100?img=3" alt="Михаил">
+                        </div>
+                        <div class="master-info">
+                            <h3>Михаил Иванов</h3>
+                            <p>Мастер современных стрижек</p>
+                            <div class="master-rating">
+                                <span class="stars">★★★★★</span>
+                                <span class="rating">4.8</span>
+                            </div>
+                        </div>
+                        <div class="master-check">✓</div>
+                    </div>
+                </div>
+
+                <button class="btn-primary" id="masters-continue-btn" onclick="showScreen('confirm-screen')" disabled>
+                    Продолжить → Подтверждение
+                </button>
+            </div>
+
+
+            <!-- Экран 7: Подтверждение записи -->
+            <div class="screen" id="confirm-screen">
+                <div class="screen-header">
+                    <h2>Подтверждение записи</h2>
+                    <p class="subtitle">Проверьте данные перед подтверждением</p>
+                </div>
+
+                <div class="confirmation-details">
+                    <div class="detail-row">
+                        <span>Услуга:</span>
+                        <strong id="confirm-service">Мужская стрижка</strong>
+                    </div>
+                    <div class="detail-row">
+                        <span>Мастер:</span>
+                        <span id="confirm-master">Алексей Петров</span>
+                    </div>
+                    <div class="detail-row">
+                        <span>Дата и время:</span>
+                        <span id="confirm-datetime">23 апр, 14:00-15:00</span>
+                    </div>
+                    <div class="detail-row">
+                        <span>Стоимость:</span>
+                        <strong id="confirm-price">1500 ₽</strong>
+                    </div>
+                    <hr>
+                    <div class="detail-row total">
+                        <span>Итого к оплате:</span>
+                        <strong id="confirm-total">1500 ₽</strong>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="client-comment">Комментарий (необязательно)</label>
+                    <textarea 
+                        id="client-comment" 
+                        placeholder="Особые пожелания..."
+                        rows="3"
+                    ></textarea>
+                </div>
+
+                <div class="notification-options">
+                    <h3>Напоминание</h3>
+                    <div class="notification-option selected">
+                        <i class="fab fa-telegram"></i>
+                        <span>Telegram</span>
+                    </div>
+                    <div class="notification-option">
+                        <i class="fab fa-whatsapp"></i>
+                        <span>WhatsApp</span>
+                    </div>
+                    <div class="notification-option">
+                        <i class="fab fa-vk"></i>
+                        <span>VK</span>
+                    </div>
+                    <div class="notification-option">
+                        <i class="fas fa-sms"></i>
+                        <span>SMS</span>
+                    </div>
+                </div>
+
+                <button class="btn-primary" onclick="confirmBooking()">
+                    Подтвердить запись
+                </button>
+            </div>
+
+            <!-- Экран 8: Результат записи -->
+            <div class="screen" id="result-screen">
+                <div class="result-container">
+                    <div class="result-icon success">✅</div>
+                    <h2>Запись подтверждена!</h2>
+                    <p>Вы успешно записались на стрижку</p>
+                    
+                    <div class="transaction-details">
+                        <div class="detail-row">
+                            <span>Номер записи:</span>
+                            <span id="booking-id">#789456</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Дата и время:</span>
+                            <span id="booking-time">23 апр, 14:00-15:00</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Мастер:</span>
+                            <span>Алексей Петров</span>
+                        </div>
+                    </div>
+
+                    <div class="reminder-note">
+                        <i class="fas fa-bell"></i>
+                        <p>Напоминание придет за 2 часа до визита в Telegram</p>
+                    </div>
+
+                    <button class="btn-primary" onclick="showScreen('home-screen')">
+                        Вернуться на главную
+                    </button>
+                    <button class="btn-secondary" onclick="showScreen('profile-screen')">
+                        Перейти в личный кабинет
+                    </button>
+                </div>
+            </div>
+
+            <!-- Экран 9: Личный кабинет -->
+            <div class="screen" id="profile-screen">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <img src="https://i.pravatar.cc/100?img=5" alt="Пользователь">
+                    </div>
+                    <div class="profile-info">
+                        <h2 id="user-name">Иван Иванов</h2>
+                        <p id="user-phone">+7 (912) 345-67-89</p>
+                    </div>
+                </div>
+
+                <div class="profile-stats">
+                    <div class="stat-card">
+                        <div class="stat-value">5</div>
+                        <div class="stat-label">Всего записей</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">4.8</div>
+                        <div class="stat-label">Средняя оценка</div>
+                    </div>
+                </div>
+
+                <div class="profile-menu">
+                    <h3>Мои записи</h3>
+                    <div class="booking-item upcoming">
+                        <div class="booking-date">24 апр, 15:00</div>
+                        <div class="booking-service">Стрижка + борода</div>
+                        <div class="booking-master">Дмитрий Смирнов</div>
+                        <div class="booking-status">Ожидается</div>
+                    </div>
+                    <div class="booking-item completed">
+                        <div class="booking-date">18 апр, 14:00</div>
+                        <div class="booking-service">Мужская стрижка</div>
+                        <div class="booking-master">Алексей Петров</div>
+                        <div class="booking-status">Выполнено</div>
+                    </div>
+
+                    <button class="menu-item" onclick="showScreen('reviews-screen')">
+                        <i class="fas fa-star"></i>
+                        <span>Мои отзывы</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <button class="menu-item" onclick="showScreen('history-screen')">
+                        <i class="fas fa-history"></i>
+                        <span>История записей</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <button class="menu-item" onclick="showScreen('settings-screen')">
+                        <i class="fas fa-cog"></i>
+                        <span>Настройки</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <button class="menu-item logout" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Выйти</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Экран 10: Панель менеджера (упрощенная) -->
+            <div class="screen" id="manager-screen">
+                <div class="screen-header">
+                    <h2>Панель менеджера</h2>
+                    <p class="subtitle">Управление барбершопом</p>
+                </div>
+
+                <div class="manager-stats">
+                    <div class="stat-card large">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">Записей сегодня</div>
+                    </div>
+                    <div class="stat-card large">
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">Свободных слотов</div>
+                    </div>
+                </div>
+
+                <div class="manager-actions">
+                    <button class="action-btn" onclick="showScreen('manager-schedule')">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Расписание</span>
+                    </button>
+                    <button class="action-btn" onclick="showScreen('manager-masters')">
+                        <i class="fas fa-users"></i>
+                        <span>Мастера</span>
+                    </button>
+                    <button class="action-btn" onclick="showScreen('manager-bookings')">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Записи</span>
+                    </button>
+                    <button class="action-btn" onclick="showScreen('manager-reviews')">
+                        <i class="fas fa-star"></i>
+                        <span>Отзывы</span>
+                    </button>
+                    <button class="action-btn" onclick="showScreen('manager-reports')">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Отчеты</span>
+                    </button>
+                </div>
+
+                <div class="today-bookings">
+                    <h3>Сегодняшние записи</h3>
+                    <div class="booking-item">
+                        <div class="booking-time">10:00</div>
+                        <div class="booking-client">Петр Сидоров</div>
+                        <div class="booking-service">Стрижка</div>
+                        <div class="booking-status pending">Ожидает</div>
+                    </div>
+                    <div class="booking-item">
+                        <div class="booking-time">11:00</div>
+                        <div class="booking-client">Андрей Козлов</div>
+                        <div class="booking-service">Бритье</div>
+                        <div class="booking-status confirmed">Подтверждено</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Экран 11: Расписание (панель управления) -->
+            <div class="screen" id="manager-schedule">
+                <div class="screen-header">
+                    <h2>Расписание</h2>
+                    <p class="subtitle">Управление расписанием мастеров</p>
+                </div>
+
+                <!-- Фильтр по мастерам -->
+                <div class="schedule-master-filter">
+                    <div class="master-filter-list" id="master-filter-list">
+                        <button class="master-filter-btn active" onclick="selectScheduleMaster(this, 'all')" data-master="all">
+                            <span>Все мастера</span>
+                        </button>
+                        <button class="master-filter-btn" onclick="selectScheduleMaster(this, '1')" data-master="1">
+                            <div class="master-filter-avatar">
+                                <img src="https://i.pravatar.cc/100?img=1" alt="Алексей">
+                            </div>
+                            <span>Алексей</span>
+                        </button>
+                        <button class="master-filter-btn" onclick="selectScheduleMaster(this, '2')" data-master="2">
+                            <div class="master-filter-avatar">
+                                <img src="https://i.pravatar.cc/100?img=2" alt="Дмитрий">
+                            </div>
+                            <span>Дмитрий</span>
+                        </button>
+                        <button class="master-filter-btn" onclick="selectScheduleMaster(this, '3')" data-master="3">
+                            <div class="master-filter-avatar">
+                                <img src="https://i.pravatar.cc/100?img=3" alt="Михаил">
+                            </div>
+                            <span>Михаил</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Календарь -->
+                <div class="calendar-container schedule-calendar">
+                    <div class="calendar-header">
+                        <button class="calendar-nav" onclick="prevScheduleMonth()">←</button>
+                        <div class="calendar-month-year" id="schedule-calendar-month-year">Апрель 2026</div>
+                        <button class="calendar-nav" onclick="nextScheduleMonth()">→</button>
+                    </div>
+                    <div class="calendar-weekdays">
+                        <span>Пн</span>
+                        <span>Вт</span>
+                        <span>Ср</span>
+                        <span>Чт</span>
+                        <span>Пт</span>
+                        <span>Сб</span>
+                        <span>Вс</span>
+                    </div>
+                    <div class="calendar-days" id="schedule-calendar-days">
+                        <!-- Дни генерируются через JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Выбранная дата -->
+                <div class="selected-date-info" id="schedule-selected-date-info" style="display: none;">
+                    <i class="fas fa-calendar-check"></i>
+                    <span id="schedule-selected-date-text">24 апреля 2026, Пятница</span>
+                </div>
+
+                <!-- Временная шкала с записями -->
+                <div class="schedule-timeline" id="schedule-timeline">
+                    <!-- Генерируется через JavaScript -->
+                </div>
+
+                <!-- Кнопка создания записи -->
+                <button class="btn-primary" onclick="showScheduleCreateBooking()">
+                    <i class="fas fa-plus"></i> Создать запись
+                </button>
+            </div>
+
+            <!-- Модальное окно деталей записи -->
+            <div class="modal-overlay" id="booking-detail-modal" style="display: none;">
+                <div class="modal-container">
+                    <div class="modal-header">
+                        <h3>Детали записи</h3>
+                        <button class="modal-close" onclick="closeBookingDetail()">✕</button>
+                    </div>
+                    <div class="modal-body" id="booking-detail-body">
+                        <!-- Заполняется через JavaScript -->
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn-secondary btn-sm" onclick="editBooking()">
+                            <i class="fas fa-edit"></i> Редактировать
+                        </button>
+                        <button class="btn-danger btn-sm" onclick="cancelBooking()">
+                            <i class="fas fa-times"></i> Отменить запись
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Экран 12: Отчёты (панель управления) -->
+            <div class="screen" id="manager-reports">
+                <div class="screen-header">
+                    <h2>Отчёты</h2>
+                    <p class="subtitle">Аналитика и статистика барбершопа</p>
+                </div>
+
+                <!-- Сводка -->
+                <div class="report-summary">
+                    <div class="summary-card">
+                        <div class="summary-icon"><i class="fas fa-ruble-sign"></i></div>
+                        <div class="summary-info">
+                            <span class="summary-label">Выручка</span>
+                            <span class="summary-value" id="report-revenue">284 500 ₽</span>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-icon"><i class="fas fa-cut"></i></div>
+                        <div class="summary-info">
+                            <span class="summary-label">Записи</span>
+                            <span class="summary-value" id="report-bookings-count">187</span>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-icon"><i class="fas fa-users"></i></div>
+                        <div class="summary-info">
+                            <span class="summary-label">Клиенты</span>
+                            <span class="summary-value" id="report-clients-count">94</span>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-icon"><i class="fas fa-chart-line"></i></div>
+                        <div class="summary-info">
+                            <span class="summary-label">Средний чек</span>
+                            <span class="summary-value" id="report-avg-check">1 521 ₽</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Фильтры -->
+                <div class="report-filters">
+                    <h3>Фильтры</h3>
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label for="report-date-from">Дата с</label>
+                            <input type="date" id="report-date-from" class="filter-input">
+                        </div>
+                        <div class="filter-group">
+                            <label for="report-date-to">Дата по</label>
+                            <input type="date" id="report-date-to" class="filter-input">
+                        </div>
+                    </div>
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label for="report-service-filter">Услуга</label>
+                            <select id="report-service-filter" class="filter-select">
+                                <option value="">Все услуги</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="report-master-filter">Мастер</label>
+                            <select id="report-master-filter" class="filter-select">
+                                <option value="">Все мастера</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filter-actions">
+                        <button class="btn-primary btn-sm" onclick="applyReportFilters()">
+                            <i class="fas fa-search"></i> Применить
+                        </button>
+                        <button class="btn-secondary btn-sm" onclick="resetReportFilters()">
+                            <i class="fas fa-undo"></i> Сбросить
+                        </button>
+                        <button class="btn-export" onclick="exportReport()">
+                            <i class="fas fa-download"></i> Экспорт
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Статистика по услугам -->
+                <div class="report-section">
+                    <h3>Статистика по услугам</h3>
+                    <div class="report-chart" id="service-chart">
+                        <!-- Генерируется через JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Статистика по мастерам -->
+                <div class="report-section">
+                    <h3>Статистика по мастерам</h3>
+                    <div class="master-stats-list" id="master-stats">
+                        <!-- Генерируется через JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Детальная таблица -->
+                <div class="report-section">
+                    <h3>Детальная таблица записей</h3>
+                    <div class="report-table" id="report-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>Клиент</th>
+                                    <th>Услуга</th>
+                                    <th>Мастер</th>
+                                    <th>Сумма</th>
+                                </tr>
+                            </thead>
+                            <tbody id="report-table-body">
+                                <!-- Генерируется через JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Экран 12: Отзывы (панель управления) -->
+            <div class="screen" id="manager-reviews">
+                <div class="screen-header">
+                    <h2>Отзывы клиентов</h2>
+                    <p class="subtitle">Все отзывы о работе барбершопа</p>
+                </div>
+
+                <!-- Фильтры отзывов -->
+                <div class="report-filters">
+                    <h3>Фильтры</h3>
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label for="review-master-filter">Мастер</label>
+                            <select id="review-master-filter" class="filter-select">
+                                <option value="">Все мастера</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="review-rating-filter">Оценка</label>
+                            <select id="review-rating-filter" class="filter-select">
+                                <option value="">Все оценки</option>
+                                <option value="5">★★★★★ 5</option>
+                                <option value="4">★★★★☆ 4</option>
+                                <option value="3">★★★☆☆ 3</option>
+                                <option value="2">★★☆☆☆ 2</option>
+                                <option value="1">★☆☆☆☆ 1</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filter-actions">
+                        <button class="btn-primary btn-sm" onclick="applyReviewFilters()">
+                            <i class="fas fa-search"></i> Применить
+                        </button>
+                        <button class="btn-secondary btn-sm" onclick="resetReviewFilters()">
+                            <i class="fas fa-undo"></i> Сбросить
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Сводка отзывов -->
+                <div class="review-summary">
+                    <div class="summary-card">
+                        <div class="summary-icon"><i class="fas fa-star"></i></div>
+                        <div class="summary-info">
+                            <span class="summary-label">Средняя оценка</span>
+                            <span class="summary-value" id="review-avg-rating">4.7</span>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-icon"><i class="fas fa-comment"></i></div>
+                        <div class="summary-info">
+                            <span class="summary-label">Всего отзывов</span>
+                            <span class="summary-value" id="review-total-count">24</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Список отзывов -->
+                <div class="reviews-list" id="reviews-list">
+                    <!-- Генерируется через JavaScript -->
+                </div>
+            </div>
+
+            <!-- Экран 13: Панель мастера -->
+            <div class="screen" id="master-screen">
+                <div class="screen-header">
+                    <h2>Панель мастера</h2>
+                    <p class="subtitle">Алексей Петров</p>
+                </div>
+
+                <div class="master-schedule">
+                    <h3>Расписание на сегодня</h3>
+                    <div class="schedule-item">
+                        <div class="schedule-time">10:00-11:00</div>
+                        <div class="schedule-client">Петр Сидоров</div>
+                        <div class="schedule-service">Стрижка</div>
+                    </div>
+                    <div class="schedule-item">
+                        <div class="schedule-time">12:00-13:00</div>
+                        <div class="schedule-client">Андрей Козлов</div>
+                        <div class="schedule-service">Бритье</div>
+                    </div>
+                    <div class="schedule-item free">
+                        <div class="schedule-time">14:00-15:00</div>
+                        <div class="schedule-client">Свободно</div>
+                        <button class="btn-small">Забронировать</button>
+                    </div>
+                </div>
+
+                <div class="master-reviews">
+                    <h3>Последние отзывы</h3>
+                    <div class="review-item">
+                        <div class="review-rating">★★★★★</div>
+                        <div class="review-text">Отличная стрижка, мастер - профессионал!</div>
+                        <div class="review-client">Иван, 20 апр</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Нижняя навигация (только для некоторых экранов) -->
+        <nav class="bottom-nav" id="bottom-nav">
+            <button class="nav-item active" onclick="showScreen('home-screen')">
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
+            </button>
+            <button class="nav-item" onclick="showScreen('services-screen')">
+                <i class="fas fa-cut"></i>
+                <span>Услуги</span>
+            </button>
+            <button class="nav-item" onclick="showScreen('profile-screen')">
+                <i class="fas fa-user"></i>
+                <span>Профиль</span>
+            </button>
+            <button class="nav-item" onclick="showScreen('manager-screen')">
+                <i class="fas fa-cog"></i>
+                <span>Управление</span>
+            </button>
+        </nav>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
